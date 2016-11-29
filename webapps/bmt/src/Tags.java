@@ -103,7 +103,7 @@ public class Tags {
 			} else 
 			{
 				TagDAO.saveTag(tagToAdd, user);
-				resp.setStatus(200);
+				resp.setStatus(201);
 				return;
 			}
 			// TODO 1
