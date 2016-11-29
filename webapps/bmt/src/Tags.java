@@ -78,6 +78,7 @@ public class Tags {
 		}
 
 		// Handle POST
+		
 		if (method == Dispatcher.RequestMethod.POST) {
 			// Get the tag list
 			List<Tag> tags = null;
@@ -89,8 +90,9 @@ public class Tags {
 				}
 			
 			//parse the query params
-			String toAdd = JSON.toString(queryParams);
-			Tag tagToAdd = (Tag) JSON.parse(toAdd);
+			JSONObject tagToAddJson = new JSONObject(queryParams.get("json").get(0));
+			String tagName = (String) tagToAddJson.get("name");
+			Tag tagToAdd = new Tag("tagName");
 			
 			
 			//le tag existe deja
