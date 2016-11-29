@@ -135,7 +135,7 @@ public class Tags {
 			}
 			
 			//Récupérer l'id du tag
-			long id = 1;
+			long id = Long.parseLong(requestPath[requestPath.length - 1]);
 			
 			//Handle GET 
 			if (method == Dispatcher.RequestMethod.GET) {
@@ -158,12 +158,42 @@ public class Tags {
 			
 			// Handle PUT
 			if (method == Dispatcher.RequestMethod.PUT) {
-				// Modifie le tag tid avec la description dans le json
+				try{
+					JSONObject tagToAddJson = new JSONObject(queryParams.get("json").get(0));
+					String newName = (String) tagToAddJson.get("name");
+					Tag tag = TagDAO.getTagById(id, user);
+					if ( TagDAO.checkTagUser(tag, user) ){
+						TagDAO.modifyTag(newName, tag, user);
+						resp.setStatus(204);
+						return;
+					}else{
+						resp.setStatus(403);
+						return;
+					}
+
+				}catch (SQLException ex) {
+					resp.setStatus(500);
+					return;
+				}
 			}
 			
 			// Handle DELETE
 			if (method == Dispatcher.RequestMethod.DELETE) {
-			
+				try{
+					Tag tag = TagDAO.getTagById(id, user);
+					if ( TagDAO.checkTagUser(tag, user) ){
+						TagDAO.deleteTag(tag, user);
+						resp.setStatus(204);
+						return;
+					}else{
+						resp.setStatus(403);
+						return;
+					}
+
+				}catch (SQLException ex) {
+					resp.setStatus(500);
+					return;
+				}
 			}
 	}
 
@@ -187,10 +217,32 @@ public class Tags {
 				resp.setStatus(405);
 				return;
 			}
-			
+			//TODO : trouver comment tester
 			// Handle GET
-			if (method == Dispatcher.RequestMethod.DELETE) {
-				// Donne les bookmarks attachés au tag tID 
+			if (method == Dispatcher.RequestMethod.GET) {
+				//Récupérer l'id du tag
+				long id = Long.parseLong(requestPath[requestPath.length - 1]);
+				try{
+					Tag tag = TagDAO.getTagById(id, user);
+					List<Bookmark> bookmarks = null;
+					bookmarks = BookmarkDAO.getBookmarksFromTag(tag);
+					String json = "[";
+					for (int i = 0, n = bookmarks.size(); i < n; i++) {
+						Bookmark bookmark = bookmarks.get(i);
+						json += bookmark.toJson();
+						if (i < n - 1)
+							json += ", ";
+					}
+					json += "]";
+
+					// Send the response
+					resp.setStatus(200);
+					resp.setContentType("application/json");
+					resp.getWriter().print(json);
+				}catch(SQLException e){
+					resp.setStatus(500);
+					return;
+				}
 			}
 		
 	}
@@ -218,8 +270,31 @@ public class Tags {
 		
 		
 		//Handle GET 
+		//TODO : A tester !
 		if (method == Dispatcher.RequestMethod.GET) {
 			//Donne l'information si le bookmark bID est attaché au tag tID
+			long tagID = Long.parseLong(requestPath[1]);
+			long bookmarkID = Long.parseLong(requestPath[requestPath.length - 1]);
+			try{
+				Tag tag = TagDAO.getTagById(tagID, user);
+				if ( tag == null){
+					resp.setStatus(404);
+					return;
+				}
+				Bookmark bookmark = BookmarkDAO.getBookmarkFromTag(tag, bookmarkID);
+				if ( bookmark == null ){
+					resp.setStatus(404);
+					return;
+				}
+				resp.getWriter().print(bookmark.toJson());
+				resp.setContentType("application/json");
+				resp.setStatus(204);
+				return;
+				
+			}catch(SQLException e){
+				resp.setStatus(500);
+				return;
+			}
 		}
 		
 		// Handle PUT
@@ -228,8 +303,24 @@ public class Tags {
 		}
 		
 		// Handle DELETE
+		//TODO : A tester !
 		if (method == Dispatcher.RequestMethod.DELETE) {
-			//Efface l'attache du tag tID au bookmark bID
+			long tagID = Long.parseLong(requestPath[1]);
+			long bookmarkID = Long.parseLong(requestPath[requestPath.length - 1]);
+			try{
+				Tag tag = TagDAO.getTagById(tagID, user);
+				if ( BookmarkDAO.checkBookmarkUserTag(tag, bookmarkID) ){
+					BookmarkDAO.deleteBookmarkFromTag(tag, bookmarkID);
+					resp.setStatus(204);
+					return;
+				}else{
+					resp.setStatus(403);
+					return;
+				}
+			}catch(SQLException e){
+				resp.setStatus(500);
+				return;
+			}
 		}
 	}
 }

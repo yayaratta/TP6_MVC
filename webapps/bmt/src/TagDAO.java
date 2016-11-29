@@ -17,8 +17,8 @@ public class TagDAO {
 	private static final String SQL_READ_TAGS = "select id,name from Tag where user_id=?";
 	private static final String SQL_SAVE_TAG = "insert into Tag " + "values(?,?,?)";
 	private static final String SQL_DELETE_TAG = "delete from Tag where id=?";
-	private static final String SQL_CHECK_TAG_USER = "select count(1) from table where id=? and user_id=?";
-
+	private static final String SQL_CHECK_TAG_USER = "select count(1) from Tag where id=? and user_id=?";
+	private static final String SQL_MODIFY_TAG = "update Tag set name=? where id =?";
 	/**
 	 * Provides the tags of a user.
 	 * 
@@ -73,11 +73,44 @@ public class TagDAO {
 		try {
 			PreparedStatement stmt = conn.prepareStatement(SQL_DELETE_TAG);
 			stmt.setLong(1, tag.getId());
-			ResultSet result = stmt.executeQuery();
+			stmt.executeUpdate();
+		} catch (Exception e) {
+			System.out.println("deleteTag exception: " + e);
 		} finally{conn.close();}
 	}
 	
+	//Modify Tag
+	public static void modifyTag (String newName, Tag tag, User user) throws SQLException {
+		Connection conn = DBConnection.getConnection();
+		try {
+			PreparedStatement stmt = conn.prepareStatement(SQL_MODIFY_TAG);
+			stmt.setString(1, newName);
+			stmt.setLong(2, tag.getId());
+			stmt.executeUpdate();
+		} catch (Exception e) {
+			System.out.println("modifyTag exception: " + e);
+		} finally{conn.close();}
+	}
 	
+	//Check if the user has access for the tag
+	public static boolean checkTagUser (Tag tag, User user) throws SQLException {
+		Connection conn = DBConnection.getConnection();
+		try {
+			PreparedStatement stmt = conn.prepareStatement(SQL_CHECK_TAG_USER);
+			stmt.setLong(1, tag.getId());
+			stmt.setLong(2, user.getId());
+			ResultSet result = stmt.executeQuery();
+			//Vaut 1 si l'utilisateur a les droits, 0 sinon
+			long check = 0;
+			while (result.next()) {
+				check = result.getLong(1); 
+			}
+			return ( check == 1 );
+		} catch (Exception e) {
+			System.out.println("checkTagUser exception: " + e);
+			return false;
+		} finally{conn.close();}
+	}
 
 	//Get Tag from a name
 	public static Tag getTagByName(String name, User user) throws SQLException {
@@ -100,13 +133,19 @@ public class TagDAO {
 	
 	//Get Tag from an ID
 	public static Tag getTagById(long id, User user) throws SQLException{
-		List<Tag> list = getTags(user);
-		for( Tag tag : list ){
-			if ( tag.getId() == id )
-				return tag;
+		List<Tag> list = null;
+		try {
+			list = getTags(user);
+		} catch (Exception e) {
+			System.out.println("getTagById");
+		}
+		if (list != null) {
+			for( Tag tag : list ){
+				if ( tag.getId() == id )
+					return tag;
+			}
 		}
 		//Essayer de renvoyer une exception plutôt
 		return null;
-		
 	}
 }
