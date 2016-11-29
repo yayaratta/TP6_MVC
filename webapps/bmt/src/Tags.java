@@ -92,7 +92,7 @@ public class Tags {
 			//parse the query params
 			JSONObject tagToAddJson = new JSONObject(queryParams.get("json").get(0));
 			String tagName = (String) tagToAddJson.get("name");
-			Tag tagToAdd = new Tag("tagName");
+			Tag tagToAdd = new Tag(tagName);
 			
 			
 			//le tag existe deja

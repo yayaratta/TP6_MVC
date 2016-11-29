@@ -114,4 +114,9 @@ public class Tag {
 		if (name==null) return id.hashCode();
 		return id.hashCode()+name.hashCode();
 	}
+	
+	@Override
+	public String toString() {
+		return "name: " + this.name + ", id: " + this.id;
+	}
 }
