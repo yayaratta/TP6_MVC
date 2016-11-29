@@ -128,6 +128,26 @@ public class Tags {
 			Map<String, List<String>> queryParams, User user) throws IOException{
 		System.out.println("Action: handleTag - " + method + "-" + queryParams);
 		// TODO 2
+		// Rule-out POST requests
+			if (method == Dispatcher.RequestMethod.POST) {
+				resp.setStatus(405);
+				return;
+			}
+			
+			//Handle GET 
+			if (method == Dispatcher.RequestMethod.GET) {
+				//Donne description du tag dont l'id est tid
+			}
+			
+			// Handle PUT
+			if (method == Dispatcher.RequestMethod.PUT) {
+				// Modifie le tag tid avec la description dans le json
+			}
+			
+			// Handle DELETE
+			if (method == Dispatcher.RequestMethod.DELETE) {
+				// supprime le tag tid 
+			}
 	}
 
 	/**
@@ -145,7 +165,17 @@ public class Tags {
 			Map<String, List<String>> queryParams, User user) throws IOException {
 		
 		System.out.println("Action: handleTagBookmarks - " + method + "-" + queryParams);
-		// TODO 2
+		// Rule-out POST, PUT and DELETE requests
+			if (method == Dispatcher.RequestMethod.POST || method == Dispatcher.RequestMethod.PUT || method == Dispatcher.RequestMethod.DELETE) {
+				resp.setStatus(405);
+				return;
+			}
+			
+			// Handle GET
+			if (method == Dispatcher.RequestMethod.DELETE) {
+				// Donne les bookmarks attachés au tag tID 
+			}
+		
 	}
 
 	/**
@@ -163,5 +193,26 @@ public class Tags {
 			Map<String, List<String>> queryParams, User user) throws IOException {
 		System.out.println("Action: handleTagBookmark - " + method + "-" + queryParams);
 		// TODO 2
+		// Rule-out POST requests
+		if (method == Dispatcher.RequestMethod.POST) {
+			resp.setStatus(405);
+			return;
+		}
+		
+		
+		//Handle GET 
+		if (method == Dispatcher.RequestMethod.GET) {
+			//Donne l'information si le bookmark bID est attaché au tag tID
+		}
+		
+		// Handle PUT
+		if (method == Dispatcher.RequestMethod.PUT) {
+			//Attache le bookmark bID au tag tID
+		}
+		
+		// Handle DELETE
+		if (method == Dispatcher.RequestMethod.DELETE) {
+			//Efface l'attache du tag tID au bookmark bID
+		}
 	}
 }
