@@ -16,6 +16,8 @@ public class TagDAO {
 	 */
 	private static final String SQL_READ_TAGS = "select id,name from Tag where user_id=?";
 	private static final String SQL_SAVE_TAG = "insert into Tag " + "values(?,?,?)";
+	private static final String SQL_DELETE_TAG = "delete from Tag where id=?";
+	private static final String SQL_CHECK_TAG_USER = "select count(1) from table where id=? and user_id=?";
 
 	/**
 	 * Provides the tags of a user.
@@ -43,6 +45,7 @@ public class TagDAO {
 		} finally{conn.close();}
 	}
 	
+	//Save tag
 	public static void saveTag (Tag tag, User user) throws SQLException {
 		Connection conn = DBConnection.getConnection();
 		try {
@@ -53,12 +56,36 @@ public class TagDAO {
 			ResultSet result = stmt.executeQuery();
 		} finally{conn.close();}
 	}
-	//TODO 
+
+	//Delete Tag
+	public static void deleteTag (Tag tag, User user) throws SQLException {
+		Connection conn = DBConnection.getConnection();
+		try {
+			PreparedStatement stmt = conn.prepareStatement(SQL_DELETE_TAG);
+			stmt.setLong(1, tag.getId());
+			ResultSet result = stmt.executeQuery();
+		} finally{conn.close();}
+	}
 	
+	
+	
+	//Get Tag from a name
 	public static Tag getTagByName(String name, User user) throws SQLException{
 		List<Tag> list = getTags(user);
 		for( Tag tag : list ){
 			if ( tag.getName().equals(name) )
+				return tag;
+		}
+		//Essayer de renvoyer une exception plutôt
+		return null;
+		
+	}
+	
+	//Get Tag from an ID
+	public static Tag getTagById(long id, User user) throws SQLException{
+		List<Tag> list = getTags(user);
+		for( Tag tag : list ){
+			if ( tag.getId() == id )
 				return tag;
 		}
 		//Essayer de renvoyer une exception plutôt

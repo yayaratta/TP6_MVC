@@ -132,9 +132,26 @@ public class Tags {
 				return;
 			}
 			
+			//Récupérer l'id du tag
+			long id = 1;
+			
 			//Handle GET 
 			if (method == Dispatcher.RequestMethod.GET) {
-				//Donne description du tag dont l'id est tid
+				try{
+					//On vérifie si le tag existe bien
+					if ( TagDAO.getTagById(id, user) == null ){
+						resp.setStatus(404);
+						return;
+					}else{
+						resp.getWriter().print(TagDAO.getTagById(id, user).toJson());
+						resp.setStatus(200);
+						return;
+					}
+				}catch (SQLException ex) {
+					resp.setStatus(500);
+					return;
+				}
+				
 			}
 			
 			// Handle PUT
@@ -144,7 +161,7 @@ public class Tags {
 			
 			// Handle DELETE
 			if (method == Dispatcher.RequestMethod.DELETE) {
-				// supprime le tag tid 
+			
 			}
 	}
 
