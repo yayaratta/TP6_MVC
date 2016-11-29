@@ -1,0 +1,19 @@
+INDEX VERSION 1.127+/user/6/.base/rattanaa/home/3A/Const_Appli_Web/TP6_MVC/Exercice-60/webapps/bmt/.metadata/.plugins/org.eclipse.jdt.core
+1171811680.index
+581497423.index
+360570869.index
+993950929.index
+2514400788.index
+782080016.index
+15908935.index
+3727482020.index
+4279327460.index
+2521162661.index
+2183613766.index
+3165592589.index
+4038094667.index
+4093091613.index
+1465319158.index
+340277636.index
+24407670.index
+3828020988.index
