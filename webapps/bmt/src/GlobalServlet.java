@@ -61,7 +61,7 @@ public class GlobalServlet extends HttpServlet {
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		doRequest(req,resp,Dispatcher.RequestMethod.GET);
+		doRequest(req,resp,Dispatcher.RequestMethod.DELETE);
 	}
 
 	/**
