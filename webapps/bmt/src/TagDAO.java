@@ -46,11 +46,20 @@ public class TagDAO {
 	public static void saveTag (Tag tag, User user) throws SQLException {
 		Connection conn = DBConnection.getConnection();
 		try {
+			if (tag.getId()==null)
+			{
+				PreparedStatement stmt1 = conn.prepareStatement("select max(id) from Tag");
+				ResultSet result = stmt1.executeQuery();
+				while (result.next()) {
+					long id = result.getLong(1);
+					tag.setId(id);
+				}
+			}
 			PreparedStatement stmt = conn.prepareStatement(SQL_SAVE_TAG);
 			stmt.setLong(1, tag.getId());
 			stmt.setString(2, tag.getName());
 			stmt.setLong(3, user.getId());
-			ResultSet result = stmt.executeQuery();
+			ResultSet result1 = stmt.executeQuery();
 		} finally{conn.close();}
 	}
 	//TODO 
