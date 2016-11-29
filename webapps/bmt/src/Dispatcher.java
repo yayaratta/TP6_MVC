@@ -82,7 +82,12 @@ public class Dispatcher {
 		// Response to /{login}/tags...
 		if ("tags".equals(requestPath[1])) {
 			if (requestPath.length == 2)
-				Tags.handleTagList(req, resp, method, requestPath, queryParams, user);
+				try {
+					Tags.handleTagList(req, resp, method, requestPath, queryParams, user);
+				} catch (SQLException e) {
+					System.out.println("dispatcher");
+					e.printStackTrace();
+				}
 			else if (requestPath.length == 3)
 				Tags.handleTag(req, resp, method, requestPath, queryParams, user);
 			else if (requestPath.length == 4)

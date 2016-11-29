@@ -46,20 +46,34 @@ public class TagDAO {
 	public static void saveTag (Tag tag, User user) throws SQLException {
 		Connection conn = DBConnection.getConnection();
 		try {
+			System.out.println("saveTag try");
 			PreparedStatement stmt = conn.prepareStatement(SQL_SAVE_TAG);
+			if (tag.getId() == null) {
+				System.out.println("tag id null");
+			}
 			stmt.setLong(1, tag.getId());
+			System.out.println("tag id: " + tag.getId());
 			stmt.setString(2, tag.getName());
 			stmt.setLong(3, user.getId());
 			ResultSet result = stmt.executeQuery();
+		} catch (Exception e) {
+			System.out.println("saveTAg: " + e);
 		} finally{conn.close();}
 	}
 	//TODO 
 	
-	public static Tag getTagByName(String name, User user) throws SQLException{
-		List<Tag> list = getTags(user);
-		for( Tag tag : list ){
-			if ( tag.getName().equals(name) )
-				return tag;
+	public static Tag getTagByName(String name, User user) throws SQLException {
+		List<Tag> list = null;
+		try {
+			list = getTags(user);
+		} catch (Exception e) {
+			System.out.println("getTagByName");
+		}
+		if (list != null) {
+			for( Tag tag : list ){
+				if ( tag.getName().equals(name) )
+					return tag;
+			}
 		}
 		//Essayer de renvoyer une exception plutôt
 		return null;
