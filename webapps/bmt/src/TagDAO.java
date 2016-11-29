@@ -15,6 +15,7 @@ public class TagDAO {
 	 * SQL query for user login
 	 */
 	private static final String SQL_READ_TAGS = "select id,name from Tag where user_id=?";
+	private static final String SQL_SAVE_TAG = "insert into Tag " + "values(?,?,?)";
 
 	/**
 	 * Provides the tags of a user.
@@ -39,6 +40,17 @@ public class TagDAO {
 				list.add(tag);
 			}
 			return list;
+		} finally{conn.close();}
+	}
+	
+	void saveTag (Tag tag, User user) throws SQLException {
+		Connection conn = DBConnection.getConnection();
+		try {
+			PreparedStatement stmt = conn.prepareStatement(SQL_SAVE_TAG);
+			stmt.setLong(1, tag.getId());
+			stmt.setString(2, tag.getName());
+			stmt.setLong(3, user.getId());
+			ResultSet result = stmt.executeQuery();
 		} finally{conn.close();}
 	}
 	//TODO 
