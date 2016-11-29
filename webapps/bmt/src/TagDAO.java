@@ -49,12 +49,11 @@ public class TagDAO {
 	public static void saveTag (Tag tag, User user) throws SQLException {
 		Connection conn = DBConnection.getConnection();
 		try {
-			if (tag.getId()==null)
-			{
-				PreparedStatement stmt1 = conn.prepareStatement("select max(id) from Tag");
-				ResultSet result = stmt1.executeQuery();
+			if (tag.getId() == null) {
+				PreparedStatement stmt = conn.prepareStatement("select max(id) from Tag");
+				ResultSet result = stmt.executeQuery();
 				while (result.next()) {
-					long id = result.getLong(1);
+					long id = result.getLong(1)+1;
 					tag.setId(id);
 				}
 			}
@@ -62,7 +61,9 @@ public class TagDAO {
 			stmt.setLong(1, tag.getId());
 			stmt.setString(2, tag.getName());
 			stmt.setLong(3, user.getId());
-			ResultSet result1 = stmt.executeQuery();
+			stmt.executeUpdate();
+		} catch (Exception e) {
+			System.out.println("saveTag exception: " + e);
 		} finally{conn.close();}
 	}
 
@@ -77,13 +78,20 @@ public class TagDAO {
 	}
 	
 	
-	
+
 	//Get Tag from a name
-	public static Tag getTagByName(String name, User user) throws SQLException{
-		List<Tag> list = getTags(user);
-		for( Tag tag : list ){
-			if ( tag.getName().equals(name) )
-				return tag;
+	public static Tag getTagByName(String name, User user) throws SQLException {
+		List<Tag> list = null;
+		try {
+			list = getTags(user);
+		} catch (Exception e) {
+			System.out.println("getTagByName");
+		}
+		if (list != null) {
+			for( Tag tag : list ){
+				if ( tag.getName().equals(name) )
+					return tag;
+			}
 		}
 		//Essayer de renvoyer une exception plutôt
 		return null;
