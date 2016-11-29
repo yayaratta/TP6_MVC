@@ -298,8 +298,24 @@ public class Tags {
 		}
 		
 		// Handle PUT
+		//TODO : a tester !
 		if (method == Dispatcher.RequestMethod.PUT) {
-			//Attache le bookmark bID au tag tID
+			long tagID = Long.parseLong(requestPath[1]);
+			long bookmarkID = Long.parseLong(requestPath[requestPath.length - 1]);
+			try{
+				Tag tag = TagDAO.getTagById(tagID, user);
+				if ( BookmarkDAO.checkBookmarkUserTag(tag, bookmarkID) ){
+					BookmarkDAO.addBookmarkToTag(tag, bookmarkID);
+					resp.setStatus(204);
+					return;
+				}else{
+					resp.setStatus(403);
+					return;
+				}
+			}catch(SQLException e){
+				resp.setStatus(500);
+				return;
+			}
 		}
 		
 		// Handle DELETE

@@ -120,7 +120,8 @@ public class BookmarkDAO {
 	public static void addBookmarkToTag( Tag tag, long id) throws SQLException{
 		Connection conn = DBConnection.getConnection();
 		try {
-			//TODO : cas où tag est nul
+			if ( tag == null )
+				return;
 			PreparedStatement stmt = conn.prepareStatement(SQL_ADD_BOOKMARK_TO_TAG);
 			stmt.setLong(1, id);
 			stmt.setLong(2, tag.getId());
