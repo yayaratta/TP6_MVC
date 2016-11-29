@@ -8,6 +8,8 @@ import java.util.regex.Matcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.jetty.util.ajax.JSON;
+import org.eclipse.jetty.util.ajax.JSON.Source;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -35,10 +37,11 @@ public class Tags {
 	 *           the user
 	 * @throws IOException
 	 *            if the response cannot be written
+	 * @throws SQLException 
 	 */
 	public static void handleTagList(HttpServletRequest req, HttpServletResponse resp,
 			Dispatcher.RequestMethod method, String[] requestPath,
-			Map<String, List<String>> queryParams, User user) throws IOException {
+			Map<String, List<String>> queryParams, User user) throws IOException, SQLException {
 		// Rule-out PUT and DELETE requests
 		System.out.println("Action: handleTagList - " + method + "-" + queryParams);
 		if (method == Dispatcher.RequestMethod.PUT || method == Dispatcher.RequestMethod.DELETE) {
@@ -76,6 +79,31 @@ public class Tags {
 
 		// Handle POST
 		if (method == Dispatcher.RequestMethod.POST) {
+			// Get the tag list
+			List<Tag> tags = null;
+			try {
+				tags = TagDAO.getTags(user);
+				} catch (SQLException ex) {
+					resp.setStatus(500);
+					return;
+				}
+			
+			//parse the query params
+			String toAdd = JSON.toString(queryParams);
+			Tag tagToAdd = (Tag) JSON.parse(toAdd);
+			
+			
+			//le tag existe deja
+			if (TagDAO.getTagByName(tagToAdd.getName(), user)!=null)
+			{
+				resp.setStatus(304);
+				return;
+			} else 
+			{
+				TagDAO.saveTag(tagToAdd, user);
+				resp.setStatus(200);
+				return;
+			}
 			// TODO 1
 		}
 

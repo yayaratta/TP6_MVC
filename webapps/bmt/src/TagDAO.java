@@ -43,7 +43,7 @@ public class TagDAO {
 		} finally{conn.close();}
 	}
 	
-	void saveTag (Tag tag, User user) throws SQLException {
+	public static void saveTag (Tag tag, User user) throws SQLException {
 		Connection conn = DBConnection.getConnection();
 		try {
 			PreparedStatement stmt = conn.prepareStatement(SQL_SAVE_TAG);
@@ -55,7 +55,7 @@ public class TagDAO {
 	}
 	//TODO 
 	
-	public Tag getTagByName(String name, User user) throws SQLException{
+	public static Tag getTagByName(String name, User user) throws SQLException{
 		List<Tag> list = getTags(user);
 		for( Tag tag : list ){
 			if ( tag.getName().equals(name) )
