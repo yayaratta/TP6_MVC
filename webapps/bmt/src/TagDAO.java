@@ -54,4 +54,15 @@ public class TagDAO {
 		} finally{conn.close();}
 	}
 	//TODO 
+	
+	public Tag getTagByName(String name, User user) throws SQLException{
+		List<Tag> list = getTags(user);
+		for( Tag tag : list ){
+			if ( tag.getName().equals(name) )
+				return tag;
+		}
+		//Essayer de renvoyer une exception plutôt
+		return null;
+		
+	}
 }
