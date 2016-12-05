@@ -12,9 +12,15 @@ import java.util.List;
  */
 public class BookmarkDAO {
 	private static final String SQL_READ_BOOKMARKS = "select id,title,description,link from Bookmark where id in (select Bookmarks_id from Bookmark_Tag where Tags_id=?)";
+	private static final String SQL_READ_USER_BOOKMARKS = "select id,title,description,link from Bookmark where user_id=?";
 	private static final String SQL_DELETE_BOOKMARK_FROM_TAG = "delete from Bookmark_Tag where Tags_id=? and Bookmarks_id=?";
+	//TODO : trouver la bonne requete; idée mettre 3 requêtes 
 	private static final String SQL_CHECK_BOOKMARK_USER_TAG = "";
 	private static final String SQL_ADD_BOOKMARK_TO_TAG = "insert into Bookmark_Tag values (?,?)";
+	private static final String SQL_SAVE_BOOKMARK = "insert into Bookmark " + "values(?,?,?,?,?)";
+	private static final String SQL_DELETE_BOOKMARK = "delete from Bookmark where id=?";
+	private static final String SQL_EMPTY_BOOKMARK_TAGS = "delete from Bookmark_Tag where Bookmarks_id=?";
+	private static final String SQL_CHECK_BOOKMARK_USER = "select count(1) from Bookmark where id=? and user_id=?";
 	
 	/**
 	 * Provides the tags of a user.
@@ -38,6 +44,34 @@ public class BookmarkDAO {
 				String description = result.getString(3);
 				String link = result.getString(4);
 				Bookmark bookmark = new Bookmark(id, title,description,link);
+				list.add(bookmark);
+			}
+			return list;
+		} finally{conn.close();}
+	}
+	
+	/**
+	 * Provides the bookmarks of a user.
+	 * 
+	 * @param user
+	 *           a user
+	 * @return user Bookmarks
+	 * @throws SQLException
+	 *            if the DB connection fails
+	 */
+	public static List<Bookmark> getBookmarksFromUser(User user) throws SQLException {
+		List<Bookmark> list = new ArrayList<Bookmark>();
+		Connection conn = DBConnection.getConnection();
+		try{
+			PreparedStatement stmt = conn.prepareStatement(SQL_READ_USER_BOOKMARKS);
+			stmt.setLong(1, user.getId());
+			ResultSet result = stmt.executeQuery();
+			while (result.next()) {
+				long id = result.getLong(1);
+				String title = result.getString(2);
+				String description = result.getString(3);
+				String link = result.getString(4);
+				Bookmark bookmark = new Bookmark(id, title, description, link);
 				list.add(bookmark);
 			}
 			return list;
@@ -98,6 +132,19 @@ public class BookmarkDAO {
 		} finally{conn.close();}
 	}
 	
+	
+	/**
+	 * Provides the tags of a user.
+	 * 
+	 * @param tag
+	 * 
+	 * @param id of the bookmark
+	 * 
+	 * @return boolean to know if the tag and bookmark are linked
+	 * 			and if they have a common user
+	 * @throws SQLException
+	 *            if the DB connection fails
+	 */
 	public static boolean checkBookmarkUserTag(Tag tag, long id)throws SQLException{
 		Connection conn = DBConnection.getConnection();
 		try {
@@ -117,6 +164,17 @@ public class BookmarkDAO {
 		} finally{conn.close();}
 	}
 	
+	/**
+	 * Provides the tags of a user.
+	 * 
+	 * @param tag
+	 * 
+	 * @param id of the bookmark          
+	 *           
+	 * @return Link bookmark and tag
+	 * @throws SQLException
+	 *            if the DB connection fails
+	 */
 	public static void addBookmarkToTag( Tag tag, long id) throws SQLException{
 		Connection conn = DBConnection.getConnection();
 		try {
@@ -132,4 +190,108 @@ public class BookmarkDAO {
 	}
 	
 	
+	//Save bookmark
+	//TODO : Gérer les tags !
+		public static void saveBookmark (Bookmark bookmark, User user) throws SQLException {
+			Connection conn = DBConnection.getConnection();
+			try {
+				if (bookmark.getId() == null) {
+					PreparedStatement stmt = conn.prepareStatement("select max(id) from Bookmark");
+					ResultSet result = stmt.executeQuery();
+					while (result.next()) {
+						long id = result.getLong(1)+1;
+						bookmark.setId(id);
+					}
+				}
+				PreparedStatement stmt = conn.prepareStatement(SQL_SAVE_BOOKMARK);
+				stmt.setLong(1, bookmark.getId());
+				stmt.setString(2, bookmark.getDescription());
+				stmt.setString(3, bookmark.getLink());
+				stmt.setString(4, bookmark.getTitle());
+				stmt.setLong(5, user.getId());
+				stmt.executeUpdate();
+			} catch (Exception e) {
+				System.out.println("saveBookmark exception: " + e);
+			} finally{conn.close();}
+		}
+
+		//Get bookmark from a name
+		//TODO: ne semble pas fonctionner ie pas pas sur de rentrer dans le if list != nul
+		//Ne renvoie jamais null j'ai l'impression
+		public static Bookmark getBookmarkByTitle(String title, User user) throws SQLException {
+			List<Bookmark> list = null;
+			try {
+				list = getBookmarksFromUser(user);
+			} catch (Exception e) {
+				System.out.println("getTagByName");
+			}
+			if (list != null) {
+				for( Bookmark bookmark : list ){
+					if ( bookmark.getTitle().equals(title) )
+						return bookmark;
+				}
+			}
+			//Essayer de renvoyer une exception plutôt
+			return null;
+			
+		}
+	
+		//Get bookmark from an ID
+		public static Bookmark getBookmarkById(long id, User user) throws SQLException {
+			List<Bookmark> list = null;
+			try {
+				list = getBookmarksFromUser(user);
+			} catch (Exception e) {
+				System.out.println("getTagByName");
+			}
+			if (list != null) {
+				for( Bookmark bookmark : list ){
+					if ( bookmark.getId() == id )
+						return bookmark;
+				}
+			}
+			//Essayer de renvoyer une exception plutôt
+			return null;
+			
+		}
+	
+		//TODO : créer fonction modifyBookmark , ressemble a modifyTag mais attention il faut gérer les tags
+
+
+		//Delete Bookmark
+		public static void deleteBookmark (Bookmark bookmark, User user) throws SQLException {
+			Connection conn = DBConnection.getConnection();
+			try {
+				//Une fois qu'on a vidé le bookmark de ses tags on peut le supprimer
+				PreparedStatement stmt = conn.prepareStatement(SQL_EMPTY_BOOKMARK_TAGS);
+				stmt.setLong(1, bookmark.getId());
+				stmt.executeUpdate();
+				stmt = conn.prepareStatement(SQL_DELETE_BOOKMARK);
+				stmt.setLong(1, bookmark.getId());
+				stmt.executeUpdate();
+			} catch (Exception e) {
+				System.out.println("deleteBookmark exception: " + e);
+			} finally{conn.close();}
+		}
+		
+		//Check if the user has access to the bookmark
+		public static boolean checkBookmarkUser (Bookmark bookmark, User user) throws SQLException {
+			Connection conn = DBConnection.getConnection();
+			try {
+				PreparedStatement stmt = conn.prepareStatement(SQL_CHECK_BOOKMARK_USER);
+				stmt.setLong(1, bookmark.getId());
+				stmt.setLong(2, user.getId());
+				ResultSet result = stmt.executeQuery();
+				//Vaut 1 si l'utilisateur a les droits, 0 sinon
+				long check = 0;
+				while (result.next()) {
+					check = result.getLong(1); 
+				}
+				return ( check == 1 );
+			} catch (Exception e) {
+				System.out.println("checkBookmarkUser exception: " + e);
+				return false;
+			} finally{conn.close();}
+		}
+
 }

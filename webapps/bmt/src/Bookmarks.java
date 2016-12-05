@@ -52,23 +52,23 @@ public class Bookmarks {
 		// Handle GET
 		if (method == Dispatcher.RequestMethod.GET) {
 			// Get the Bookmark list
-			List<Tag> tags = null;
+			List<Bookmark> bookmarks = null;
 			try {
-				tags = TagDAO.getTags(user);
+				bookmarks = BookmarkDAO.getBookmarksFromUser(user);
 			} catch (SQLException ex) {
 				resp.setStatus(500);
 				return;
 			}
-
 			// Encode the tag list to JSON
 			String json = "[";
-			for (int i = 0, n = tags.size(); i < n; i++) {
-				Tag tag = tags.get(i);
-				json += tag.toJson();
+			for (int i = 0, n = bookmarks.size(); i < n; i++) {
+				Bookmark bookmark = bookmarks.get(i);
+				json += bookmark.toJson();
 				if (i < n - 1)
 					json += ", ";
 			}
 			json += "]";
+//TODO : gérer l'affichage
 
 			// Send the response
 			resp.setStatus(200);
@@ -80,36 +80,102 @@ public class Bookmarks {
 		// Handle POST
 		
 		if (method == Dispatcher.RequestMethod.POST) {
-			// Get the tag list
-			List<Tag> tags = null;
+			// Get the Bookmark list
+			List<Bookmark> bookmarks = null;
 			try {
-				tags = TagDAO.getTags(user);
+				bookmarks = BookmarkDAO.getBookmarksFromUser(user);
 				} catch (SQLException ex) {
 					resp.setStatus(500);
 					return;
 				}
-			
 			//parse the query params
-			JSONObject tagToAddJson = new JSONObject(queryParams.get("json").get(0));
-			String tagName = (String) tagToAddJson.get("name");
-			Tag tagToAdd = new Tag(tagName);
-			
-			
+			JSONObject bookmarkToAddJson = new JSONObject(queryParams.get("json").get(0));
+			String bookmarkTitle = (String) bookmarkToAddJson.get("title");
+			String bookmarkDescription = (String) bookmarkToAddJson.get("description");
+			String bookmarkLink = (String) bookmarkToAddJson.get("link");
+			Bookmark bookmarkToAdd = new Bookmark(bookmarkTitle, bookmarkDescription, bookmarkLink);
 			//le tag existe deja
-			if (TagDAO.getTagByName(tagToAdd.getName(), user)!=null)
+			if (BookmarkDAO.getBookmarkByTitle(bookmarkTitle, user)!=null)
 			{
+				System.out.println("existe déja");
 				resp.setStatus(304);
 				return;
 			} else 
 			{
-				TagDAO.saveTag(tagToAdd, user);
-				resp.setStatus(201);
+				BookmarkDAO.saveBookmark(bookmarkToAdd, user);
+				resp.setStatus(200);
 				return;
 			}
-			// TODO 1
+
 		}
 
 		// Other
 		resp.setStatus(405);
 	}
+	
+	
+	/**
+	 * TODO comment
+	 * 
+	 * @param req
+	 * @param resp
+	 * @param method
+	 * @param requestPath
+	 * @param queryParams
+	 * @param user
+	 */
+	public static void handleBookmark(HttpServletRequest req, HttpServletResponse resp,
+			Dispatcher.RequestMethod method, String[] requestPath,
+			Map<String, List<String>> queryParams, User user) throws IOException{
+		System.out.println("Action: handleBookmark - " + method + "-" + queryParams);
+		// TODO 2
+		// Rule-out POST requests
+			if (method == Dispatcher.RequestMethod.POST) {
+				resp.setStatus(405);
+				return;
+			}
+			//Récupérer l'id du bookmark
+			long id = Long.parseLong(requestPath[requestPath.length - 1]);
+			
+			//Handle GET 
+			if (method == Dispatcher.RequestMethod.GET) {
+				try{
+					//On vérifie si le tag existe bien
+					if ( BookmarkDAO.getBookmarkById(id, user) == null ){
+						resp.setStatus(404);
+						return;
+					}else{
+						resp.getWriter().print(BookmarkDAO.getBookmarkById(id, user).toJson());
+						resp.setStatus(200);
+						return;
+					}
+				}catch (SQLException ex) {
+					resp.setStatus(500);
+					return;
+				}
+			}
+			//Handle PUT 
+			if (method == Dispatcher.RequestMethod.PUT) {
+				//TODO : attention aux tags !
+			}
+			//Handle DELETE 
+			if (method == Dispatcher.RequestMethod.DELETE) {
+				try{
+					Bookmark bookmark = BookmarkDAO.getBookmarkById(id, user);
+					if ( BookmarkDAO.checkBookmarkUser(bookmark, user) ){
+						BookmarkDAO.deleteBookmark(bookmark, user);
+						resp.setStatus(204);
+						return;
+					}else{
+						resp.setStatus(403);
+						return;
+					}
+
+				}catch (SQLException ex) {
+					resp.setStatus(500);
+					return;
+				}
+			}
+	}
+	
 }

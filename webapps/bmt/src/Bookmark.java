@@ -52,11 +52,11 @@ public class Bookmark {
 	 * @param title
 	 *           title
 	 */
-	public Bookmark(String title) {
+	public Bookmark(String title,String description, String link) {
 		super();
 		this.id = null;
-		this.link = null;
-		this.description = null;
+		this.link = link;
+		this.description = description;
 		this.title = title;
 	}
 
@@ -70,11 +70,11 @@ public class Bookmark {
 		this.id = id;
 	}
 
-	public String gettitle() {
+	public String getTitle() {
 		return title;
 	}
 
-	public void settitle(String title) {
+	public void setTitle(String title) {
 		this.title = title;
 	}
 
@@ -102,23 +102,23 @@ public class Bookmark {
 	public String toJson() {
 		String json = "{";
 		if (id != null)
-			json += "\"id\":" + id;
+			json += "\"id\":" + this.id;
 		if (title != null) {
 			if (json.length() > 1)
 				json += ", ";
-			json += "\"title\":\"" + title + "\"";
+			json += "\"title\":\"" + this.title + "\"";
 		}
 		if (description != null){
 			if (json.length() > 1)
 				json += ", ";
-			json += "\"description\":\"" + description + "\"";
+			json += "\"description\":\"" + this.description + "\"";
 		}
 		if (link != null){
 			if (json.length() > 1)
 				json += ", ";
-			json += "\"link\":\"" + link + "\"";
+			json += "\"link\":\"" + this.link + "\"";
 		}
-		json += "}";
+		json += ",\"Tags\":[]}";
 		return json;
 	}
 
