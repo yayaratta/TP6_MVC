@@ -302,11 +302,12 @@ public class BookmarkDAO {
 			Bookmark bookmark, User user) throws SQLException {
 		Connection conn = DBConnection.getConnection();
 		try {
+			System.out.println("ON EST BIEN LA ?");
 			PreparedStatement stmt = null;
 			System.out.println("modifyBookmark");
-			System.out.println("vider" + stmt);
 			stmt = conn.prepareStatement(SQL_EMPTY_BOOKMARK_TAGS);
 			stmt.setLong(1, bookmark.getId());
+			System.out.println("vider : " + stmt);
 			stmt.executeUpdate();
 			if (!tags.isEmpty()) {
 				System.out.println("if");
