@@ -176,7 +176,8 @@ public class Bookmarks {
 					String newLink = (String) bookmarkToModify.get("link");
 					System.out.println("Liste des tags : " + bookmarkToModify.get("tags"));
 					System.out.println("tags class : " + bookmarkToModify.get("tags").getClass());
-					String[] tagList = (String[]) bookmarkToModify.get("tags");
+					// String[] tagList = (String[]) bookmarkToModify.get("tags");
+					String[] tagList = null;
 					Bookmark bookmark = BookmarkDAO.getBookmarkById(id, user);
 					if (BookmarkDAO.checkBookmarkUser(bookmark, user)) {
 						BookmarkDAO.modifyBookmark(newTitle, newDescription, newLink, tagList, bookmark, user);
