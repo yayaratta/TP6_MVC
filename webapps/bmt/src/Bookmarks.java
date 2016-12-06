@@ -170,6 +170,7 @@ public class Bookmarks {
 					String newTitle = (String) bookmarkToModify.get("title");
 					String newDescription = (String) bookmarkToModify.get("description");
 					String newLink = (String) bookmarkToModify.get("link");
+					bookmark.getTags().clear();
 					for (int i = 0; i < ((JSONArray) bookmarkToModify.get("tags")).length(); i++) {
 						String tagName = (String) ((JSONObject) ((JSONArray) bookmarkToModify.get("tags")).get(i)).getString("name");
 						Tag tag = TagDAO.getTagByName(tagName, user);
