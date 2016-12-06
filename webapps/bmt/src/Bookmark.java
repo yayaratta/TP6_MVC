@@ -209,11 +209,11 @@ public class Bookmark {
 		return "title: " + this.title + ", id: " + this.id + ", description: " + this.description + ", link: " + this.link;
 	}
 
-	private Map<Long,Tag> getTags() {
+	public Map<Long,Tag> getTags() {
 		return tags;
 	}
 
-	private void setTags(Map<Long,Tag> tags) {
+	public void setTags(Map<Long,Tag> tags) {
 		this.tags = tags;
 	}
 }
