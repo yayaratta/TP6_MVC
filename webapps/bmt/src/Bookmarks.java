@@ -56,6 +56,8 @@ public class Bookmarks {
 			List<Bookmark> bookmarks = null;
 			try {
 				bookmarks = BookmarkDAO.getBookmarksFromUser(user);
+				if (bookmarks.get(0).getTags().isEmpty())
+					System.out.println("first tags are empty");
 			} catch (SQLException ex) {
 				resp.setStatus(500);
 				return;
