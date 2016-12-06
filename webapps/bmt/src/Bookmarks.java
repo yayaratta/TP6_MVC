@@ -69,7 +69,8 @@ public class Bookmarks {
 					json += ", ";
 			}
 			json += "]";
-
+			System.out.println("affichage json");
+			System.out.println(json);
 
 			// Send the response
 			resp.setStatus(200);
