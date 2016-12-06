@@ -46,8 +46,6 @@ public class Bookmarks {
 			return;
 		}
 		
-		///////////////////////////////////////////////////////////
-
 		// Handle GET
 		if (method == Dispatcher.RequestMethod.GET) {
 			// Get the Bookmark list
@@ -69,8 +67,6 @@ public class Bookmarks {
 					json += ", ";
 			}
 			json += "]";
-			System.out.println("affichage json");
-			System.out.println(json);
 
 			// Send the response
 			resp.setStatus(200);
@@ -78,8 +74,6 @@ public class Bookmarks {
 			resp.getWriter().print(json);
 			return;
 		}
-
-		////////////////////////////////////////////////////////
 		
 		// Handle POST
 		if (method == Dispatcher.RequestMethod.POST) {
@@ -181,7 +175,6 @@ public class Bookmarks {
 						Tag tag = TagDAO.getTagByName(tagName, user);
 						bookmark.getTags().put(tag.getId(), tag);
 					}
-					System.out.println("bookmark tagmap : " + bookmark.getTags().toString());
 					if (BookmarkDAO.checkBookmarkUser(bookmark, user)) {
 						BookmarkDAO.modifyBookmark(newTitle, newDescription, newLink, bookmark.getTags(), bookmark, user);
 						resp.setStatus(204);

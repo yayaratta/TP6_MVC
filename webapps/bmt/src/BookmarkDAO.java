@@ -79,16 +79,11 @@ public class BookmarkDAO {
 				String link = result.getString(4);
 				Map<Long,Tag> tags = new HashMap<>();
 				//Ajouter les tags
-				System.out.println("on prepare la nouvelle requete");
 				stmt2 = conn.prepareStatement(SQL_GET_TAGS);
-				System.out.println("on initie les entrée");
 				stmt2.setLong(1, id);
-				System.out.println("on va executer la nouvelle requete");
 				ResultSet result2 = stmt2.executeQuery();
-				System.out.println("execution OK");
 				while ( result2.next() ){
 					long tagId = result2.getLong(1);
-					System.out.println(" tag id : " + tagId);
 					try{
 						Tag tag = TagDAO.getTagById(tagId, user);
 						if ( tag == null)
@@ -98,7 +93,6 @@ public class BookmarkDAO {
 						e.printStackTrace();
 					}
 				}
-				System.out.println("ajout du bookmark a la liste");
 				Bookmark bookmark = new Bookmark(id, title, description, link, tags);
 				list.add(bookmark);
 			}
@@ -310,7 +304,7 @@ public class BookmarkDAO {
 		try {
 			PreparedStatement stmt = null;
 			System.out.println("modifyBookmark");
-			
+			System.out.println("vider" + stmt);
 			stmt = conn.prepareStatement(SQL_EMPTY_BOOKMARK_TAGS);
 			stmt.setLong(1, bookmark.getId());
 			stmt.executeUpdate();
