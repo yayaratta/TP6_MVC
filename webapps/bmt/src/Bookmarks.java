@@ -157,6 +157,28 @@ public class Bookmarks {
 			//Handle PUT 
 			if (method == Dispatcher.RequestMethod.PUT) {
 				//TODO : attention aux tags !
+				try {
+					JSONObject bookmarkToModify = new JSONObject(queryParams.get("json").get(0));
+					String newTitle = (String) bookmarkToModify.get("title");
+					String newDescription = (String) bookmarkToModify.get("description");
+					String newLink = (String) bookmarkToModify.get("link");
+					System.out.println("Liste des tags : " + bookmarkToModify.get("tags"));
+					System.out.println("tags class : " + bookmarkToModify.get("tags").getClass());
+					String[] tagList = (String[]) bookmarkToModify.get("tags");
+					Bookmark bookmark = BookmarkDAO.getBookmarkById(id, user);
+					if (BookmarkDAO.checkBookmarkUser(bookmark, user)) {
+						BookmarkDAO.modifyBookmark(newTitle, newDescription, newLink, tagList, bookmark, user);
+						resp.setStatus(204);
+						return;
+					} else {
+						resp.setStatus(403);
+						return;
+					}
+
+				} catch (SQLException ex) {
+					resp.setStatus(500);
+					return;
+				}
 			}
 			//Handle DELETE 
 			if (method == Dispatcher.RequestMethod.DELETE) {
