@@ -15,7 +15,7 @@ public class BookmarkDAO {
 	private static final String SQL_READ_USER_BOOKMARKS = "select id,title,description,link from Bookmark where user_id=?";
 	private static final String SQL_DELETE_BOOKMARK_FROM_TAG = "delete from Bookmark_Tag where Tags_id=? and Bookmarks_id=?";
 	//TODO : trouver la bonne requete; idée mettre 3 requêtes 
-	private static final String SQL_CHECK_BOOKMARK_USER_TAG = "";
+	private static final String SQL_CHECK_BOOKMARK_USER_TAG = "(select count(1) from bookmark where user_id=? and id=?) and (select count(1) from tag where user_id=? and id =?)";
 	private static final String SQL_ADD_BOOKMARK_TO_TAG = "insert into Bookmark_Tag values (?,?)";
 	private static final String SQL_SAVE_BOOKMARK = "insert into Bookmark " + "values(?,?,?,?,?)";
 	private static final String SQL_DELETE_BOOKMARK = "delete from Bookmark where id=?";
@@ -147,12 +147,14 @@ public class BookmarkDAO {
 	 * @throws SQLException
 	 *            if the DB connection fails
 	 */
-	public static boolean checkBookmarkUserTag(Tag tag, long id)throws SQLException{
+	public static boolean checkBookmarkUserTag(Tag tag, long id,User user)throws SQLException{
 		Connection conn = DBConnection.getConnection();
 		try {
 			PreparedStatement stmt = conn.prepareStatement(SQL_CHECK_BOOKMARK_USER_TAG);
-			stmt.setLong(1, tag.getId());
+			stmt.setLong(1, user.getId());
 			stmt.setLong(2, id);
+			stmt.setLong(3, user.getId());
+			stmt.setLong(4, tag.getId());
 			ResultSet result = stmt.executeQuery();
 			//Vaut 1 si l'utilisateur a les droits, 0 sinon
 			long check = 0;
