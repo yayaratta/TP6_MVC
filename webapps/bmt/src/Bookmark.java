@@ -118,7 +118,7 @@ public class Bookmark {
 				json += ", ";
 			json += "\"link\":\"" + this.link + "\"";
 		}
-		json += ",\"Tags\":[]}";
+		json += ",\"tags\":[]}";
 		return json;
 	}
 

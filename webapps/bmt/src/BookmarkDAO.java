@@ -219,7 +219,7 @@ public class BookmarkDAO {
 
 		//Get bookmark from a name
 		//TODO: ne semble pas fonctionner ie pas pas sur de rentrer dans le if list != nul
-		//Ne renvoie jamais null j'ai l'impression
+		//On peut créer deux bookmarks avec le meme nom
 		public static Bookmark getBookmarkByTitle(String title, User user) throws SQLException {
 			List<Bookmark> list = null;
 			try {

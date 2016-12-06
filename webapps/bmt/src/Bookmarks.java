@@ -68,7 +68,7 @@ public class Bookmarks {
 					json += ", ";
 			}
 			json += "]";
-//TODO : gérer l'affichage
+
 
 			// Send the response
 			resp.setStatus(200);
