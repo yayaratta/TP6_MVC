@@ -34,6 +34,10 @@ public class Bookmark {
 	private Map<Long,Tag> tags;
 
 
+	public Map<Long,Tag> getTags() {
+		return this.tags;
+	}
+	
 	/**
 	 * Creates a new bookmark
 	 * 

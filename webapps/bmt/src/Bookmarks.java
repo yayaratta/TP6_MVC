@@ -2,14 +2,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.util.ajax.JSON;
-import org.eclipse.jetty.util.ajax.JSON.Source;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -48,6 +44,8 @@ public class Bookmarks {
 			resp.setStatus(405);
 			return;
 		}
+		
+		///////////////////////////////////////////////////////////
 
 		// Handle GET
 		if (method == Dispatcher.RequestMethod.GET) {
@@ -77,8 +75,9 @@ public class Bookmarks {
 			return;
 		}
 
-		// Handle POST
+		////////////////////////////////////////////////////////
 		
+		// Handle POST
 		if (method == Dispatcher.RequestMethod.POST) {
 			// Get the Bookmark list
 			List<Bookmark> bookmarks = null;
@@ -156,19 +155,20 @@ public class Bookmarks {
 			}
 			//Handle PUT 
 			if (method == Dispatcher.RequestMethod.PUT) {
-				//TODO : attention aux tags !
 				try {
+					Bookmark bookmark = BookmarkDAO.getBookmarkById(id, user);
 					JSONObject bookmarkToModify = new JSONObject(queryParams.get("json").get(0));
 					String newTitle = (String) bookmarkToModify.get("title");
 					String newDescription = (String) bookmarkToModify.get("description");
 					String newLink = (String) bookmarkToModify.get("link");
-					System.out.println("Liste des tags : " + bookmarkToModify.get("tags"));
-					System.out.println("tags class : " + bookmarkToModify.get("tags").getClass());
-					// String[] tagList = (String[]) bookmarkToModify.get("tags");
-					String[] tagList = null;
-					Bookmark bookmark = BookmarkDAO.getBookmarkById(id, user);
+					for (int i = 0; i < ((JSONArray) bookmarkToModify.get("tags")).length(); i++) {
+						String tagName = (String) ((JSONObject) ((JSONArray) bookmarkToModify.get("tags")).get(i)).getString("name");
+						Tag tag = TagDAO.getTagByName(tagName, user);
+						bookmark.getTags().put(tag.getId(), tag);
+					}
+					System.out.println("bookmark tagmap : " + bookmark.getTags().toString());
 					if (BookmarkDAO.checkBookmarkUser(bookmark, user)) {
-						BookmarkDAO.modifyBookmark(newTitle, newDescription, newLink, tagList, bookmark, user);
+						BookmarkDAO.modifyBookmark(newTitle, newDescription, newLink, bookmark.getTags(), bookmark, user);
 						resp.setStatus(204);
 						return;
 					} else {
