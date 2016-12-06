@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +54,8 @@ public class Bookmarks {
 			List<Bookmark> bookmarks = null;
 			try {
 				bookmarks = BookmarkDAO.getBookmarksFromUser(user);
+				if (bookmarks.get(0).getTags().isEmpty())
+					System.out.println("first tags are empty");
 			} catch (SQLException ex) {
 				resp.setStatus(500);
 				return;
@@ -66,7 +69,8 @@ public class Bookmarks {
 					json += ", ";
 			}
 			json += "]";
-
+			System.out.println("affichage json");
+			System.out.println(json);
 
 			// Send the response
 			resp.setStatus(200);
@@ -92,7 +96,18 @@ public class Bookmarks {
 			String bookmarkTitle = (String) bookmarkToAddJson.get("title");
 			String bookmarkDescription = (String) bookmarkToAddJson.get("description");
 			String bookmarkLink = (String) bookmarkToAddJson.get("link");
-			Bookmark bookmarkToAdd = new Bookmark(bookmarkTitle, bookmarkDescription, bookmarkLink);
+			//On parse la list des tags comme list de string
+			JSONArray tagsInBookmark = bookmarkToAddJson.getJSONArray("tags");
+			HashMap<Long,Tag> tagsMap = new HashMap<Long,Tag>();
+			//Mise a jour de la HashMap
+			for(int i = 0; i < tagsInBookmark.length(); i++)
+			{
+				JSONObject tagToAddJSON = tagsInBookmark.getJSONObject(i);
+				Tag tagToAdd = new Tag(Long.parseLong((String) tagToAddJSON.get("id")),(String) tagToAddJSON.get("name"));
+				tagsMap.put(tagToAdd.getId(), tagToAdd);
+			}
+			//On créer l'objet bookmark
+			Bookmark bookmarkToAdd = new Bookmark(bookmarkTitle, bookmarkDescription, bookmarkLink, tagsMap);
 			//le tag existe deja
 			if (BookmarkDAO.getBookmarkByTitle(bookmarkTitle, user)!=null)
 			{

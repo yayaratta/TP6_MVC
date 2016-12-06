@@ -3,6 +3,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +24,7 @@ public class BookmarkDAO {
 	private static final String SQL_EMPTY_BOOKMARK_TAGS = "delete from Bookmark_Tag where Bookmarks_id=?";
 	private static final String SQL_CHECK_BOOKMARK_USER = "select count(1) from Bookmark where id=? and user_id=?";
 	private static final String SQL_MODIFY_BOOKMARK_WITHOUT_TAGS = "update Bookmark set title=?, description=?, link=? where id =?";
-	private static final String SQL_GET_BOOKMARK_TAG = "select TAGS_ID from Bookmark_Tag where Bookmarks_id=?";
+	private static final String SQL_GET_TAGS ="select Tags_id from Bookmark_Tag where Bookmarks_id  = ?";
 	/**
 	 * Provides the tags of a user.
 	 * 
@@ -68,6 +69,7 @@ public class BookmarkDAO {
 		Connection conn = DBConnection.getConnection();
 		try {
 			PreparedStatement stmt = conn.prepareStatement(SQL_READ_USER_BOOKMARKS);
+			PreparedStatement stmt2;
 			stmt.setLong(1, user.getId());
 			ResultSet result = stmt.executeQuery();
 			while (result.next()) {
@@ -75,13 +77,37 @@ public class BookmarkDAO {
 				String title = result.getString(2);
 				String description = result.getString(3);
 				String link = result.getString(4);
-				Bookmark bookmark = new Bookmark(id, title, description, link);
-				list.add(bookmark);				
+				Map<Long,Tag> tags = new HashMap<>();
+				//Ajouter les tags
+				System.out.println("on prepare la nouvelle requete");
+				stmt2 = conn.prepareStatement(SQL_GET_TAGS);
+				System.out.println("on initie les entrée");
+				stmt2.setLong(1, id);
+				System.out.println("on va executer la nouvelle requete");
+				ResultSet result2 = stmt2.executeQuery();
+				System.out.println("execution OK");
+				while ( result2.next() ){
+					long tagId = result2.getLong(1);
+					System.out.println(" tag id : " + tagId);
+					try{
+						Tag tag = TagDAO.getTagById(tagId, user);
+						if ( tag == null)
+							System.out.println("le tag ets nul");
+						tags.put(tagId, tag);
+					}catch(SQLException e){
+						e.printStackTrace();
+					}
+				}
+				System.out.println("ajout du bookmark a la liste");
+				Bookmark bookmark = new Bookmark(id, title, description, link, tags);
+				list.add(bookmark);
 			}
 			return list;
-		} finally {
-			conn.close();
+		}catch(SQLException e){
+			e.printStackTrace();
+			return null;
 		}
+		finally{conn.close();}
 	}
 
 	/**

@@ -56,7 +56,7 @@ public class Bookmark {
 		this.title = title;
 		this.description = description;
 		this.link = link;
-		this.tags = new HashMap<>();
+		this.setTags(new HashMap<>());
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class Bookmark {
 		this.link = link;
 		this.description = description;
 		this.title = title;
-		this.tags = new HashMap<>();
+		this.setTags(new HashMap<>());
 	}
 
 
@@ -82,7 +82,7 @@ public class Bookmark {
 		this.title = title;
 		this.description = description;
 		this.link = link;
-		this.tags = tags;
+		this.setTags(tags);
 	}
 
 	public Bookmark(Long id, String title, String description, String link, Map<Long, Tag> tags) {
@@ -91,7 +91,7 @@ public class Bookmark {
 		this.title = title;
 		this.description = description;
 		this.link = link;
-		this.tags = tags;
+		this.setTags(tags);
 	}
 
 	public Long getId() {
@@ -150,7 +150,18 @@ public class Bookmark {
 				json += ", ";
 			json += "\"link\":\"" + this.link + "\"";
 		}
-		json += ",\"tags\":[]}";
+		String jsonTags = "";
+		if ( !getTags().isEmpty() ){
+			System.out.println("not empty");
+			for (Tag tag : getTags().values())
+			{
+			    jsonTags += tag.toJson() + ", ";
+			}
+			jsonTags = jsonTags.substring(0, jsonTags.length()- 2);
+		}else{
+			System.out.println("empty");
+		}
+		json += ",\"tags\":[" + jsonTags + "]}";
 		return json;
 	}
 
@@ -203,5 +214,13 @@ public class Bookmark {
 	@Override
 	public String toString() {
 		return "title: " + this.title + ", id: " + this.id + ", description: " + this.description + ", link: " + this.link;
+	}
+
+	public Map<Long,Tag> getTags() {
+		return tags;
+	}
+
+	public void setTags(Map<Long,Tag> tags) {
+		this.tags = tags;
 	}
 }
