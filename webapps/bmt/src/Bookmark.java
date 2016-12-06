@@ -32,8 +32,7 @@ public class Bookmark {
 	 * Bookmark's tags
 	 */
 	private Map<Long,Tag> tags;
-
-
+	
 	/**
 	 * Creates a new bookmark
 	 * 
