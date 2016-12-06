@@ -76,38 +76,11 @@ public class BookmarkDAO {
 				String title = result.getString(2);
 				String description = result.getString(3);
 				String link = result.getString(4);
-				Map<Long,Tag> tags = new HashMap<>();
-				//Ajouter les tags
-				System.out.println("on prepare la nouvelle requete");
-				stmt2 = conn.prepareStatement(SQL_GET_TAGS);
-				System.out.println("on initie les entrée");
-				stmt2.setLong(1, id);
-				System.out.println("on va executer la nouvelle requete");
-				ResultSet result2 = stmt2.executeQuery();
-				System.out.println("execution OK");
-				while ( result2.next() ){
-					long tagId = result2.getLong(1);
-					System.out.println(" tag id : " + tagId);
-					try{
-						Tag tag = TagDAO.getTagById(tagId, user);
-						if ( tag == null)
-							System.out.println("le tag ets nul");
-						tags.put(tagId, tag);
-					}catch(SQLException e){
-						e.printStackTrace();
-					}
-				}
-				System.out.println("ajout du bookmark a la liste");
-				Bookmark bookmark = new Bookmark(id, title, description, link, tags);
+				Bookmark bookmark = new Bookmark(id, title, description, link);
 				list.add(bookmark);
 			}
 			return list;
-		}catch(SQLException e){
-			e.printStackTrace();
-			return null;
-		}
-		finally{conn.close();}
-		
+		} finally{conn.close();}
 	}
 	
 	/**
@@ -244,6 +217,14 @@ public class BookmarkDAO {
 				stmt.setString(4, bookmark.getTitle());
 				stmt.setLong(5, user.getId());
 				stmt.executeUpdate();
+				for ( long tagId : bookmark.getTags().keySet())
+				{
+					stmt = conn.prepareStatement(SQL_ADD_BOOKMARK_TO_TAG);
+					stmt.setLong(1,bookmark.getId());
+					stmt.setLong(2,tagId);
+					System.out.println("tag " + tagId + " add to bookmark " + bookmark.getId() );
+					stmt.executeUpdate();
+					}
 			} catch (Exception e) {
 				System.out.println("saveBookmark exception: " + e);
 			} finally{conn.close();}
