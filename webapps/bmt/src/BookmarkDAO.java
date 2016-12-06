@@ -3,7 +3,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Provides the data-base access object for tags.
@@ -23,7 +25,7 @@ public class BookmarkDAO {
 	private static final String SQL_CHECK_BOOKMARK_USER = "select count(1) from Bookmark where id=? and user_id=?";
 	private static final String SQL_MODIFY_BOOKMARK = "update Bookmark set title=?, description=?, link=?, tags=? where id =?";
 	private static final String SQL_MODIFY_BOOKMARK_WITHOUT_TAGS = "update Bookmark set title=?, description=?, link=? where id =?";
-
+	private static final String SQL_GET_TAGS ="select Tags_id from Bookmark_Tag where Bookmarks_id  = ?";
 	/**
 	 * Provides the tags of a user.
 	 * 
@@ -66,6 +68,7 @@ public class BookmarkDAO {
 		Connection conn = DBConnection.getConnection();
 		try{
 			PreparedStatement stmt = conn.prepareStatement(SQL_READ_USER_BOOKMARKS);
+			PreparedStatement stmt2;
 			stmt.setLong(1, user.getId());
 			ResultSet result = stmt.executeQuery();
 			while (result.next()) {
