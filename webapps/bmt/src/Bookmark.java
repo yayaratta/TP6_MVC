@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * // TODO comment
  * 
@@ -24,6 +27,11 @@ public class Bookmark {
 	 * Bookmark link
 	 */
 	private String link;
+	
+	/**
+	 * Bookmark's tags
+	 */
+	private Map<Long,Tag> tags;
 
 
 	/**
@@ -44,6 +52,7 @@ public class Bookmark {
 		this.title = title;
 		this.description = description;
 		this.link = link;
+		this.tags = new HashMap<>();
 	}
 
 	/**
@@ -58,9 +67,28 @@ public class Bookmark {
 		this.link = link;
 		this.description = description;
 		this.title = title;
+		this.tags = new HashMap<>();
 	}
 
 
+
+	public Bookmark(String title, String description, String link, Map<Long, Tag> tags) {
+		super();
+		this.id = null;
+		this.title = title;
+		this.description = description;
+		this.link = link;
+		this.tags = tags;
+	}
+
+	public Bookmark(Long id, String title, String description, String link, Map<Long, Tag> tags) {
+		super();
+		this.id = id;
+		this.title = title;
+		this.description = description;
+		this.link = link;
+		this.tags = tags;
+	}
 
 	public Long getId() {
 		return id;
