@@ -15,13 +15,15 @@ public class BookmarkDAO {
 	private static final String SQL_READ_USER_BOOKMARKS = "select id,title,description,link from Bookmark where user_id=?";
 	private static final String SQL_DELETE_BOOKMARK_FROM_TAG = "delete from Bookmark_Tag where Tags_id=? and Bookmarks_id=?";
 	//TODO : trouver la bonne requete; idée mettre 3 requêtes 
-	private static final String SQL_CHECK_BOOKMARK_USER_TAG = "";
+	private static final String SQL_CHECK_BOOKMARK_USER_TAG = "(select count(1) from bookmark where user_id=? and id=?) and (select count(1) from tag where user_id=? and id =?)";
 	private static final String SQL_ADD_BOOKMARK_TO_TAG = "insert into Bookmark_Tag values (?,?)";
 	private static final String SQL_SAVE_BOOKMARK = "insert into Bookmark " + "values(?,?,?,?,?)";
 	private static final String SQL_DELETE_BOOKMARK = "delete from Bookmark where id=?";
 	private static final String SQL_EMPTY_BOOKMARK_TAGS = "delete from Bookmark_Tag where Bookmarks_id=?";
 	private static final String SQL_CHECK_BOOKMARK_USER = "select count(1) from Bookmark where id=? and user_id=?";
-	
+	private static final String SQL_MODIFY_BOOKMARK = "update Tag set title=?, description=?, link=?, tags=? where id =?";
+	private static final String SQL_MODIFY_BOOKMARK_WITHOUT_TAGS = "update Tag set title=?, description=?, link=? where id =?";
+
 	/**
 	 * Provides the tags of a user.
 	 * 
@@ -145,12 +147,14 @@ public class BookmarkDAO {
 	 * @throws SQLException
 	 *            if the DB connection fails
 	 */
-	public static boolean checkBookmarkUserTag(Tag tag, long id)throws SQLException{
+	public static boolean checkBookmarkUserTag(Tag tag, long id,User user)throws SQLException{
 		Connection conn = DBConnection.getConnection();
 		try {
 			PreparedStatement stmt = conn.prepareStatement(SQL_CHECK_BOOKMARK_USER_TAG);
-			stmt.setLong(1, tag.getId());
+			stmt.setLong(1, user.getId());
 			stmt.setLong(2, id);
+			stmt.setLong(3, user.getId());
+			stmt.setLong(4, tag.getId());
 			ResultSet result = stmt.executeQuery();
 			//Vaut 1 si l'utilisateur a les droits, 0 sinon
 			long check = 0;
@@ -254,7 +258,23 @@ public class BookmarkDAO {
 		}
 	
 		//TODO : créer fonction modifyBookmark , ressemble a modifyTag mais attention il faut gérer les tags
-
+		public static void modifyBookmark(String newTitle, String newDescription, String newLink, String[] tags, Bookmark bookmark, User user) throws SQLException {
+			Connection conn = DBConnection.getConnection();
+			try {
+				PreparedStatement stmt = conn.prepareStatement(SQL_MODIFY_BOOKMARK_WITHOUT_TAGS);
+				stmt.setString(1, newTitle);
+				stmt.setLong(5, bookmark.getId());
+				stmt.setString(2, newDescription);
+				stmt.setString(3, newLink);
+				
+				System.out.println("modifyBookmark sans les tags");
+				// stmt.setNString(4, tags);
+				
+				stmt.executeUpdate();
+			} catch (Exception e) {
+				System.out.println("modifyTag exception: " + e);
+			} finally{conn.close();}
+		}
 
 		//Delete Bookmark
 		public static void deleteBookmark (Bookmark bookmark, User user) throws SQLException {
