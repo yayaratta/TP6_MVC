@@ -235,19 +235,25 @@ public class BookmarkDAO {
 					long id = result.getLong(1) + 1;
 					bookmark.setId(id);
 				}
+				stmt = conn.prepareStatement(SQL_SAVE_BOOKMARK);
+				stmt.setLong(1, bookmark.getId());
+				stmt.setString(2, bookmark.getDescription());
+				stmt.setString(3, bookmark.getLink());
+				stmt.setString(4, bookmark.getTitle());
+				stmt.setLong(5, user.getId());
+				stmt.executeUpdate();
+				for ( long tagId : bookmark.getTags().keySet())
+				{
+					stmt = conn.prepareStatement(SQL_ADD_BOOKMARK_TO_TAG);
+					stmt.setLong(1,bookmark.getId());
+					stmt.setLong(2,tagId);
+					System.out.println("tag " + tagId + " add to bookmark " + bookmark.getId() );
+					stmt.executeUpdate();
+					}
 			}
-			PreparedStatement stmt = conn.prepareStatement(SQL_SAVE_BOOKMARK);
-			stmt.setLong(1, bookmark.getId());
-			stmt.setString(2, bookmark.getDescription());
-			stmt.setString(3, bookmark.getLink());
-			stmt.setString(4, bookmark.getTitle());
-			stmt.setLong(5, user.getId());
-			stmt.executeUpdate();
 		} catch (Exception e) {
 			System.out.println("saveBookmark exception: " + e);
-		} finally {
-			conn.close();
-		}
+		} finally{conn.close();}
 	}
 
 	// Get bookmark from a name
