@@ -304,7 +304,7 @@ public class Tags {
 			long bookmarkID = Long.parseLong(requestPath[requestPath.length - 1]);
 			try{
 				Tag tag = TagDAO.getTagById(tagID, user);
-				if ( BookmarkDAO.checkBookmarkUserTag(tag, bookmarkID) ){
+				if ( BookmarkDAO.checkBookmarkUserTag(tag, bookmarkID,user) ){
 					BookmarkDAO.addBookmarkToTag(tag, bookmarkID);
 					resp.setStatus(204);
 					return;
@@ -325,7 +325,7 @@ public class Tags {
 			long bookmarkID = Long.parseLong(requestPath[requestPath.length - 1]);
 			try{
 				Tag tag = TagDAO.getTagById(tagID, user);
-				if ( BookmarkDAO.checkBookmarkUserTag(tag, bookmarkID) ){
+				if ( BookmarkDAO.checkBookmarkUserTag(tag, bookmarkID,user) ){
 					BookmarkDAO.deleteBookmarkFromTag(tag, bookmarkID);
 					resp.setStatus(204);
 					return;
