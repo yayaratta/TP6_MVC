@@ -148,11 +148,14 @@ public class Bookmark {
 		}
 		String jsonTags = "";
 		if ( !getTags().isEmpty() ){
-			for (Map.Entry<Long, Tag> entry : getTags().entrySet())
+			System.out.println("not empty");
+			for (Tag tag : getTags().values())
 			{
-			    jsonTags += entry.getValue().toJson() + ", ";
+			    jsonTags += tag.toJson() + ", ";
 			}
 			jsonTags = jsonTags.substring(0, jsonTags.length()- 2);
+		}else{
+			System.out.println("empty");
 		}
 		json += ",\"tags\":[" + jsonTags + "]}";
 		return json;
