@@ -146,7 +146,15 @@ public class Bookmark {
 				json += ", ";
 			json += "\"link\":\"" + this.link + "\"";
 		}
-		json += ",\"tags\":[]}";
+		String jsonTags = "";
+		if ( !tags.isEmpty() ){
+			for (Map.Entry<Long, Tag> entry : tags.entrySet())
+			{
+			    jsonTags += entry.getValue().toJson() + ", ";
+			}
+			jsonTags = jsonTags.substring(0, jsonTags.length()- 2);
+		}
+		json += ",\"tags\":[" + jsonTags + "]}";
 		return json;
 	}
 
