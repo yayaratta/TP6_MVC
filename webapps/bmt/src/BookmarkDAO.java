@@ -21,8 +21,8 @@ public class BookmarkDAO {
 	private static final String SQL_DELETE_BOOKMARK = "delete from Bookmark where id=?";
 	private static final String SQL_EMPTY_BOOKMARK_TAGS = "delete from Bookmark_Tag where Bookmarks_id=?";
 	private static final String SQL_CHECK_BOOKMARK_USER = "select count(1) from Bookmark where id=? and user_id=?";
-	private static final String SQL_MODIFY_BOOKMARK = "update Tag set title=?, description=?, link=?, tags=? where id =?";
-	private static final String SQL_MODIFY_BOOKMARK_WITHOUT_TAGS = "update Tag set title=?, description=?, link=? where id =?";
+	private static final String SQL_MODIFY_BOOKMARK = "update Bookmark set title=?, description=?, link=?, tags=? where id =?";
+	private static final String SQL_MODIFY_BOOKMARK_WITHOUT_TAGS = "update Bookmark set title=?, description=?, link=? where id =?";
 
 	/**
 	 * Provides the tags of a user.
@@ -257,17 +257,25 @@ public class BookmarkDAO {
 			
 		}
 	
-		//TODO : créer fonction modifyBookmark , ressemble a modifyTag mais attention il faut gérer les tags
+		/**
+		 * Modify a bookmark given in parameter
+		 * 
+		 * @param newTitle
+		 * @param newDescription
+		 * @param newLink
+		 * @param tags
+		 * @param bookmark
+		 * @param user
+		 */
 		public static void modifyBookmark(String newTitle, String newDescription, String newLink, String[] tags, Bookmark bookmark, User user) throws SQLException {
 			Connection conn = DBConnection.getConnection();
 			try {
 				PreparedStatement stmt = conn.prepareStatement(SQL_MODIFY_BOOKMARK_WITHOUT_TAGS);
 				stmt.setString(1, newTitle);
-				stmt.setLong(5, bookmark.getId());
+				stmt.setLong(4, bookmark.getId()); // 5 en modifiant les tags
 				stmt.setString(2, newDescription);
 				stmt.setString(3, newLink);
 				
-				System.out.println("modifyBookmark sans les tags");
 				// stmt.setNString(4, tags);
 				
 				stmt.executeUpdate();
